@@ -14,7 +14,8 @@ if int(version_current) < int(version_online):
     print('{} {} {}'.format("La mise a jour", version_online, "est disponible"))
     input_var = input("Voulez-vous la télécharger: [Y/n]")
     if input_var == 'Y' or input_var == 'y':
-        os.popen("curl -s https://raw.githubusercontent.com/PhilippeLefevre/Utilities_Python/master/getHost > " + sys.argv[0] + "").read()        
+        os.popen("curl -s https://raw.githubusercontent.com/PhilippeLefevre/Utilities_Python/master/getHost > " + sys.argv[0] + "").read()
+        print("Mis à jour")
 
 # Verification root
 euid = os.geteuid()
