@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-# getHost_0.9.2
+# getHost_0.9.3
 
 import os;
 import sys;
@@ -9,10 +9,7 @@ version_current = (os.popen("cat " + sys.argv[0] + " | grep 'getHost_' | cut -c 
 version_online = (os.popen("curl -s https://raw.githubusercontent.com/PhilippeLefevre/Utilities_Python/master/getHost | grep 'getHost_' | cut -c 11- | head -1 | tr -d '.'").read()).rstrip('\n')
 
 if int(version_current) < int(version_online):
-    print(version_current)
-    print(version_online)
-    print('{} {} {}'.format("La mise a jour", version_online, "est disponible"))
-    input_var = input("Voulez-vous la télécharger: [Y/n]")
+    input_var = input("Une mise à jour est disponible, voulez-vous la télécharger ? : [Y/n]")
     if input_var == 'Y' or input_var == 'y':
         os.popen("curl -s https://raw.githubusercontent.com/PhilippeLefevre/Utilities_Python/master/getHost > " + sys.argv[0] + "").read()
         print("Mis à jour")
@@ -25,6 +22,8 @@ if euid != 0:
     # the next line replaces the currently-running process with the sudo
     os.execlpe('sudo', *args)
 
+columns, rows = os.get_terminal_size(0)
+
 uMAC = []
 aMAC = []
 print("==> Recupération des IPs")
@@ -36,23 +35,32 @@ MACs = ((os.popen("echo \"" + nMap + "\" | grep 'MAC Address: ' | cut -c 14- | c
 # Listes des interfaces réeaux
 ITs = ((os.popen("echo \"" + nMap + "\" | grep 'MAC Address: ' | cut -c 32- | tr -d '(),'").read()).rstrip('\n')).split('\n')
 
+
 my_name = []
 NETB = []
 NETB_len = len(IPs)
-for i, (ip, mac, it) in enumerate(zip(IPs, MACs, ITs)):
-    # Get NetBIOS
-    NETB.insert(i, (os.popen("nbtscan \"" + ip + "\" | tail -n1 | awk '{print $2}'").read()).rstrip('\n'))
-    name = ""
-    for j in aMAC:
-        if j == mac:
-            name = uMAC[aMAC.index(j)]
-    my_name.insert(i, name)
-    print("==> Recupération des infos [", int(100 * float(i + 1)/float(NETB_len)), "%]", end='\r')
+if columns > 143:
+    print('{} {} {} {} {} {} {} {} {} {} {}'.format("╔", '═'*16, "╦", '═'*24, "╦", '═'*24, "╦", '═'*17, "╦", '═'*48, "╗"))
+    print('{} {:^16} {} {:^24} {} {:^24} {} {:^17} {} {:^48} {}'.format("║", "IP adress", "║", "NetBIOS", "║", "Nom", "║", "MAC adress", "║", "Motherboard", "║"))
+    print('{} {} {} {} {} {} {} {} {} {} {}'.format("╠", '═'*16, "╬", '═'*24, "╬", '═'*24, "╬", '═'*17, "╬", '═'*48, "╣"))
 
-print('{} {} {} {} {} {} {} {} {} {} {}'.format("╔", '═'*16, "╦", '═'*24, "╦", '═'*24, "╦", '═'*17, "╦", '═'*48, "╗"))
-print('{} {:^16} {} {:^24} {} {:^24} {} {:^17} {} {:^48} {}'.format("║", "IP adress", "║", "NetBIOS", "║", "Nom", "║", "MAC adress", "║", "Motherboard", "║"))
-print('{} {} {} {} {} {} {} {} {} {} {}'.format("╠", '═'*16, "╬", '═'*24, "╬", '═'*24, "╬", '═'*17, "╬", '═'*48, "╣"))
-
-for i, (ip, mac, it) in enumerate(zip(IPs, MACs, ITs)):
-    print('{} {:16} {} {:^24} {} {:^24} {} {:^17} {} {:^48} {}'.format("║", IPs[i], "║", NETB[i], "║", my_name[i], "║", MACs[i], "║", ITs[i], "║"))
-print('{} {} {} {} {} {} {} {} {} {} {}'.format("╚", '═'*16, "╩", '═'*24, "╩", '═'*24, "╩", '═'*17, "╩", '═'*48, "╝"))
+    for i, (ip, mac, it) in enumerate(zip(IPs, MACs, ITs)):
+        # Get NetBIOS
+        NETB.insert(i, (os.popen("nbtscan \"" + ip + "\" | tail -n1 | awk '{print $2}'").read()).rstrip('\n'))
+        name = ""
+        for j in aMAC:
+            if j == mac:
+                name = uMAC[aMAC.index(j)]
+        my_name.insert(i, name)
+        # print("==> Recupération des infos [", int(100 * float(i + 1)/float(NETB_len)), "%]", end='\r')
+        print('{} {:16} {} {:^24} {} {:^24} {} {:^17} {} {:^48} {}'.format("║", IPs[i], "║", NETB[i], "║", my_name[i], "║", MACs[i], "║", ITs[i], "║"))
+        print('{} {} {} {} {} {} {} {} {} {} {}'.format("╚", '═'*16, "╩", '═'*24, "╩", '═'*24, "╩", '═'*17, "╩", '═'*48, "╝"))
+else:
+    print("IP address       NetBIOS Name     Server    User             MAC address")
+    print("------------------------------------------------------------------------------")
+    for i, (ip, mac, it) in enumerate(zip(IPs, MACs, ITs)):
+        NETB.insert(i, (os.popen("nbtscan \"" + ip + "\" | tail -n1 | grep '10.16'").read()).rstrip('\n'))
+        if NETB[i]:
+            print(NETB[i])
+        else:
+            print('{:13} {:>64}'.format(IPs[i], MACs[i]))
