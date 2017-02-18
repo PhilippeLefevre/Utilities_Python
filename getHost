@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-# getHost_0.9.3
+# getHost_0.9.4
 
 import os;
 import sys;
@@ -13,6 +13,8 @@ if int(version_current) < int(version_online):
     if input_var == 'Y' or input_var == 'y':
         os.popen("curl -s https://raw.githubusercontent.com/PhilippeLefevre/Utilities_Python/master/getHost > " + sys.argv[0] + "").read()
         print("Mis à jour")
+        args = ['sudo', sys.executable] + sys.argv + [os.environ]
+        os.execlpe('sudo', *args)
 
 # Verification root
 euid = os.geteuid()
@@ -54,7 +56,7 @@ if columns > 143:
         my_name.insert(i, name)
         # print("==> Recupération des infos [", int(100 * float(i + 1)/float(NETB_len)), "%]", end='\r')
         print('{} {:16} {} {:^24} {} {:^24} {} {:^17} {} {:^48} {}'.format("║", IPs[i], "║", NETB[i], "║", my_name[i], "║", MACs[i], "║", ITs[i], "║"))
-        print('{} {} {} {} {} {} {} {} {} {} {}'.format("╚", '═'*16, "╩", '═'*24, "╩", '═'*24, "╩", '═'*17, "╩", '═'*48, "╝"))
+    print('{} {} {} {} {} {} {} {} {} {} {}'.format("╚", '═'*16, "╩", '═'*24, "╩", '═'*24, "╩", '═'*17, "╩", '═'*48, "╝"))
 else:
     print("IP address       NetBIOS Name     Server    User             MAC address")
     print("------------------------------------------------------------------------------")
