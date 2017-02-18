@@ -1,17 +1,22 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
-# getHost_0.9.0
+# getHost_0.9.1
 
 import os;
 import sys;
 
-#print(sys.argv[0])
-version_current = ((os.popen("cat " + sys.argv[0] + " | grep 'getHost_' | cut -c 3- | head -1").read()).rstrip('\n')).split('\n')
-version_online = ((os.popen("curl -s https://raw.githubusercontent.com/PhilippeLefevre/Utilities_Python/master/getHost | grep 'getHost_' | cut -c 3- | head -1").read()).rstrip('\n')).split('\n')
+version_current = (os.popen("cat " + sys.argv[0] + " | grep 'getHost_' | cut -c 11- | head -1 | tr -d '.'").read()).rstrip('\n')
+version_online = (os.popen("curl -s https://raw.githubusercontent.com/PhilippeLefevre/Utilities_Python/master/getHost | grep 'getHost_' | cut -c 11- | head -1 | tr -d '.'").read()).rstrip('\n')
 
-if version_current == version_online:
-    print("up-to-date")
-else:
+if int(version_current) < int(version_online):
+    print(version_current)
+    print(version_online)
+    print('{} {} {}'.format("La mise a jour", version_online, "est disponible"))
+    input_var = input("Voulez-vous la télécharger: [Y/n]")
+    if input_var == 'Y' or input_var == 'y':
+        print("yes")
+    else:
+        print("non")
     os.popen("curl -s https://raw.githubusercontent.com/PhilippeLefevre/Utilities_Python/master/getHost > " + sys.argv[0] + "").read()
 
 # Verification root
